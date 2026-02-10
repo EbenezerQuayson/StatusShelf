@@ -41,7 +41,7 @@ Follow these steps to run StatusShelf on your local machine.
 ### Steps
 1.  **Clone the Repository**
     ```bash
-    git clone [https://github.com/yourusername/statusshelf.git](https://github.com/yourusername/statusshelf.git)
+    git clone [https://github.com/EbenezerQuayson/statusshelf.git](https://github.com/EbenezerQuayson/statusshelf.git)
     ```
 
 2.  **Move to Server Directory**
@@ -79,3 +79,4 @@ statusshelf/
 ├── marketplace.php     # Main product feed
 ├── shop.php            # Individual Seller Storefront
 └── explore.php         # Category discovery page
+
