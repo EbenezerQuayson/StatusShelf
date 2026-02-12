@@ -84,10 +84,16 @@ $products_result = $conn->query($product_sql);
                         </div>
                         
                         <div class="flex gap-2">
-                            <button class="p-2 text-gray-400 hover:text-red-500 transition" title="Delete">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
+    <a href="edit_product.php?id=<?php echo $product['id']; ?>" class="p-2 text-gray-400 hover:text-blue-500 transition" title="Edit">
+        <i class="fa-solid fa-pen"></i>
+    </a>
+    
+    <a href="delete_product.php?id=<?php echo $product['id']; ?>" 
+       onclick="return confirm('Are you sure you want to delete this product?');"
+       class="p-2 text-gray-400 hover:text-red-500 transition" title="Delete">
+        <i class="fa-solid fa-trash"></i>
+    </a>
+</div>
                     </div>
 
                 <?php endwhile; ?>
