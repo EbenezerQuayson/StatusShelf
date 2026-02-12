@@ -2,6 +2,8 @@
 session_start();
 require_once '../config/db.php';
 
+
+
 // 1. Security Check: Kick them out if not logged in
 if (!isset($_SESSION['customer_id'])) {
     header("Location: login.php");
@@ -10,6 +12,12 @@ if (!isset($_SESSION['customer_id'])) {
 
 $customer_id = $_SESSION['customer_id'];
 $customer_name = $_SESSION['customer_name']; // Got this from login_logic.php
+
+
+// Fetch fresh user data (to get the image)
+$user_query = $conn->query("SELECT * FROM customers WHERE id = '$customer_id'");
+$user_data = $user_query->fetch_assoc();
+
 
 // 2. Fetch Saved Items (Future Proofing)
 // We join the 'saved_items' table with 'products' to get the details
@@ -33,15 +41,22 @@ $saved_result = $conn->query($sql);
 </head>
 <body class="bg-gray-50 pb-20">
 
-    <header class="bg-white shadow-sm px-4 py-4 flex justify-between items-center sticky top-0 z-10">
+    <header class="bg-white shadow-sm px-4 py-4  flex justify-between items-center sticky top-0 z-10">
         <h1 class="font-bold text-lg text-gray-800">My Account</h1>
-        <a href="../logout.php" class="text-red-500 text-sm font-medium hover:text-red-700">Logout</a>
+        <div>
+        <a href="settings.php" class="text-gray-400 hover:text-gray-600 mr-4"><i class="fa-solid fa-gear"></i></a>
+        <a href="../logout.php" class="text-red-500 text-sm font-medium hover:text-red-700"><i class="fa-solid fa-arrow-right-from-bracket"></i></a>
+        </div>
     </header>
 
     <div class="bg-white p-6 m-4 rounded-xl shadow-sm flex items-center gap-4 border border-gray-100">
-        <div class="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center text-green-600 text-xl font-bold border-2 border-green-50">
-            <?php echo strtoupper(substr($customer_name, 0, 2)); ?>
-        </div>
+       <div class="w-14 h-14 rounded-full flex items-center justify-center overflow-hidden border-2 border-green-50 bg-green-100 text-green-600 text-xl font-bold">
+    <?php if (!empty($user_data['profile_image'])): ?>
+        <img src="../<?php echo $user_data['profile_image']; ?>" class="w-full h-full object-cover">
+    <?php else: ?>
+        <?php echo strtoupper(substr($customer_name, 0, 2)); ?>
+    <?php endif; ?>
+</div>
         <div>
             <h2 class="font-bold text-lg text-gray-900"><?php echo htmlspecialchars($customer_name); ?></h2>
             <p class="text-gray-500 text-sm">Member since 2026</p>
