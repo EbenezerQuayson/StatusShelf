@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../config/db.php';
-
+require_once '../includes/base_url.php';
 // 1. Security Check
 if (!isset($_SESSION['seller_id'])) {
     header("Location: login.php");
@@ -25,16 +25,11 @@ if (isset($_GET['id'])) {
     header("Location: dashboard.php");
     exit();
 }
+
+$page_title = "Edit Product - " . htmlspecialchars($product['name']);
 ?>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Edit Product - StatusShelf</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+<?php include '../includes/header.php'; ?>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
     <div class="bg-white w-full max-w-md rounded-2xl shadow-lg overflow-hidden">

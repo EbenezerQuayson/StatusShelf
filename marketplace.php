@@ -1,7 +1,8 @@
 <?php
+// FIX 1: Start the session so login checks work
+session_start();
 require_once 'config/db.php';
-
-// --- FIX: Define the variable so the HTML doesn't complain ---
+require_once 'includes/base_url.php';
 $category_filter = isset($_GET['category']) ? $_GET['category'] : 'All';
 $search_query = isset($_GET['search']) ? $_GET['search'] : '';
 
@@ -27,18 +28,9 @@ if (!empty($search_query)) {
 $sql .= " ORDER BY products.id DESC";
 
 $result = $conn->query($sql);
+$page_title = "Marketplace - StatusShelf";
 ?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marketplace - StatusShelf</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>.no-scrollbar::-webkit-scrollbar { display: none; } .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }</style>
-</head>
+<?php include 'includes/header.php'; ?>
 <body class="bg-gray-100 pb-20">
 
     <header class="sticky top-0 z-50 bg-white shadow-sm border-b border-gray-200">
@@ -50,14 +42,14 @@ $result = $conn->query($sql);
         </div>
         
         <div class="px-4 pb-3 max-w-xl mx-auto">
-    <form action="marketplace.php" method="GET" class="relative">
-        <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
-        <input type="text" name="search"  id="search-input"
-               value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
-               placeholder="Search products..." 
-               class="w-full bg-gray-100 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:bg-white transition">
-    </form>
-</div>
+            <form action="marketplace.php" method="GET" class="relative">
+                <i class="fa-solid fa-search absolute left-3 top-3 text-gray-400"></i>
+                <input type="text" name="search" id="search-input"
+                       value="<?php echo isset($_GET['search']) ? htmlspecialchars($_GET['search']) : ''; ?>"
+                       placeholder="Search products..." 
+                       class="w-full bg-gray-100 rounded-lg py-2 pl-10 pr-4 text-sm focus:outline-none focus:bg-white transition">
+            </form>
+        </div>
     </header>
 
     <main class="max-w-xl mx-auto px-4 py-4">
@@ -89,7 +81,6 @@ $result = $conn->query($sql);
                                 <h3 class="text-sm text-gray-700 font-medium truncate"><?php echo htmlspecialchars($row['name']); ?></h3>
                                 <p class="text-lg font-bold text-gray-900">₵ <?php echo number_format($row['price'], 2); ?></p>
                             </div>
-                            
 
                             <div class="mt-3 pt-3 border-t border-gray-100">
                                 <a href="shop.php?u=<?php echo $row['username']; ?>" class="flex items-center gap-2 mb-2 hover:bg-gray-50 p-1 rounded transition">
@@ -103,15 +94,16 @@ $result = $conn->query($sql);
                                     $msg = "Hi! I want to buy " . $row['name'] . " (₵" . $row['price'] . ")";
                                     $wa_link = "https://wa.me/" . $row['phone_number'] . "?text=" . urlencode($msg);
                                 ?>
-                                <a href="<?php echo $wa_link; ?>" target="_blank" class="w-full bg-green-50 text-green-700 border border-green-200 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 hover:bg-green-100 transition">
+                                
+                                <a href="<?php echo $wa_link; ?>" onclick="trackClick(<?php echo $row['id']; ?>)" target="_blank" class="w-full bg-green-50 text-green-700 border border-green-200 py-1.5 rounded-lg text-xs font-bold flex items-center justify-center gap-1 hover:bg-green-100 transition">
                                     <i class="fa-brands fa-whatsapp"></i> Buy Now
                                 </a>
 
-                                <button onclick="toggleSave(this, <?php echo $row['id']; ?>)" 
-            class="w-10 h-8 rounded-lg border border-gray-200 text-gray-400 flex items-center justify-center hover:text-red-500 hover:bg-red-50 transition">
-        <i class="fa-regular fa-heart"></i>
-    </button>
-
+                                <div class="mt-2 flex justify-end">
+                                    <button onclick="toggleSave(this, <?php echo $row['id']; ?>)" class="w-8 h-8 rounded-full border border-gray-200 text-gray-400 flex items-center justify-center hover:text-red-500 hover:bg-red-50 transition">
+                                        <i class="fa-regular fa-heart"></i>
+                                    </button>
+                                </div>
                                 
                             </div>
                         </div>
@@ -126,8 +118,8 @@ $result = $conn->query($sql);
 
         </div>
     </main>
-<nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around py-3 pb-safe z-50">
-        
+
+    <nav class="fixed bottom-0 w-full bg-white border-t border-gray-200 flex justify-around py-3 pb-safe z-50">
         <a href="marketplace.php" class="text-green-600 flex flex-col items-center gap-1">
             <i class="fa-solid fa-home"></i>
             <span class="text-[10px] font-medium">Home</span>
@@ -139,68 +131,67 @@ $result = $conn->query($sql);
         </a>
 
         <?php if (isset($_SESSION['customer_id'])): ?>
-            
             <a href="customer/profile.php" class="text-gray-400 flex flex-col items-center gap-1 hover:text-gray-600">
                 <i class="fa-solid fa-user"></i>
                 <span class="text-[10px] font-medium">Profile</span>
             </a>
-
         <?php else: ?>
-            
             <a href="customer/login.php" class="text-gray-400 flex flex-col items-center gap-1 hover:text-green-600">
                 <i class="fa-solid fa-right-to-bracket"></i>
                 <span class="text-[10px] font-medium">Login</span>
             </a>
-
         <?php endif; ?>
-
     </nav>
 
-</body>
-</html>
-</body>
 <script>
+    // Search Logic
     document.getElementById('search-input').addEventListener('keyup', function() {
         let query = this.value;
         let formData = new FormData();
         formData.append('query', query);
-        // We DO NOT append seller_id here, so it searches everyone.
 
         fetch('includes/search_logic.php', { method: 'POST', body: formData })
         .then(response => response.text())
         .then(data => { document.getElementById('product-grid').innerHTML = data; });
     });
 
+    // Save/Heart Logic
     function toggleSave(btn, productId) {
-    let icon = btn.querySelector('i');
+        let icon = btn.querySelector('i');
+        let formData = new FormData();
+        formData.append('product_id', productId);
 
-    // 1. Send Request to Backend
-    let formData = new FormData();
-    formData.append('product_id', productId);
+        fetch('includes/ajax_save.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.text())
+        .then(data => {
+            if (data.trim() === "saved") {
+                icon.classList.remove('fa-regular');
+                icon.classList.add('fa-solid', 'text-red-500');
+                btn.classList.add('bg-red-50', 'border-red-200');
+            } else if (data.trim() === "removed") {
+                icon.classList.remove('fa-solid', 'text-red-500');
+                icon.classList.add('fa-regular');
+                btn.classList.remove('bg-red-50', 'border-red-200');
+            } else if (data.trim() === "login_required") {
+                alert("Please login to save items!");
+                window.location.href = "customer/login.php";
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
 
-    fetch('includes/ajax_save.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.text())
-    .then(data => {
-        if (data.trim() === "saved") {
-            // Success: Turn Heart Red
-            icon.classList.remove('fa-regular');
-            icon.classList.add('fa-solid', 'text-red-500');
-            btn.classList.add('bg-red-50', 'border-red-200');
-        } else if (data.trim() === "removed") {
-            // Success: Turn Heart Gray
-            icon.classList.remove('fa-solid', 'text-red-500');
-            icon.classList.add('fa-regular');
-            btn.classList.remove('bg-red-50', 'border-red-200');
-        } else if (data.trim() === "login_required") {
-            // Error: User not logged in
-            alert("Please login to save items!");
-            window.location.href = "customer/login.php";
+    // Track Clicks Logic (Added this so it doesn't crash if missing)
+    function trackClick(productId) {
+        if(typeof navigator.sendBeacon === "function") {
+            let formData = new FormData();
+            formData.append('product_id', productId);
+            navigator.sendBeacon('seller/includes/track_click.php', formData);
         }
-    })
-    .catch(error => console.error('Error:', error));
-}
+    }
 </script>
+
+</body>
 </html>

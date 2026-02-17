@@ -1,12 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Create Store - StatusShelf</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
+<?php
+require_once '../includes/base_url.php';
+
+$page_title = "Create Store - StatusShelf";
+
+?>
+
+<?php include '../includes/header.php' ?>
 <body class="bg-gray-50 flex items-center justify-center min-h-screen px-4 py-8">
 
     <div class="w-full max-w-md bg-white p-8 rounded-2xl shadow-lg border border-gray-100">
